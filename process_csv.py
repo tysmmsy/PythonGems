@@ -5,11 +5,12 @@ import datetime
 import random
 import tarfile
 
-# CSVファイルのコピー元とコピー先のディレクトリを指定
+# CSVファイルのコピー元(source_dir)とコピー先(target_dir)のディレクトリ、圧縮ファイルアップロード先(upload_dir)を指定
 source_dir = "source"
 target_dir = "./"
 upload_dir = "./upload/"
 
+# 処理開始前の整合性を保つためにコピー先ディレクトリ内のファイルを削除
 def remove_files_starting_with_2023(target_dir):
     for filename in os.listdir(target_dir):
         if filename.lower().startswith('2023') and filename.lower().endswith('.csv'):
@@ -22,11 +23,6 @@ def copy_all_csv_files(source_dir, target_dir):
                 source_file_path = os.path.join(root, file)
                 target_file_path = os.path.join(target_dir, file)
                 shutil.copy2(source_file_path, target_file_path)
-
-# スクリプト実行前に'2023'で始まるCSVファイルを削除
-remove_files_starting_with_2023(target_dir)
-# source_dir内の全てのCSVファイルをtarget_dirにコピー
-copy_all_csv_files(source_dir, target_dir)
 
 def skip_and_merge_rows(csv_path):
     # 'Shift_JIS'エンコーディングでファイルの行を読み込む、エラーは無視
@@ -62,6 +58,11 @@ def compress_file(file_path, output_dir):
     output_file_path = os.path.join(output_dir, f'{os.path.basename(file_path)}.tar.gz')
     with tarfile.open(output_file_path, 'w:gz', format=tarfile.GNU_FORMAT) as tar:
         tar.add(file_path, arcname=os.path.basename(file_path))
+
+# スクリプト実行前に'2023'で始まるCSVファイルを削除
+remove_files_starting_with_2023(target_dir)
+# source_dir内の全てのCSVファイルをtarget_dirにコピー
+copy_all_csv_files(source_dir, target_dir)
 
 # target_dir内の全てのCSVファイルを処理する
 for filename in os.listdir(target_dir):
