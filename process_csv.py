@@ -6,9 +6,9 @@ import random
 import tarfile
 
 # CSVファイルのコピー元(source_dir)とコピー先(target_dir)のディレクトリ、圧縮ファイルアップロード先(upload_dir)を指定
-source_dir = "source"
-target_dir = "./"
-upload_dir = "./upload/"
+SOURCE_DIR = "source"
+TARGET_DIR = "./"
+UPLOAD_DIR = "./upload/"
 
 # 処理開始前の整合性を保つためにコピー先ディレクトリ内のファイルを削除
 def remove_files_starting_with_2023(target_dir):
@@ -59,21 +59,25 @@ def compress_file(file_path, output_dir):
     with tarfile.open(output_file_path, 'w:gz', format=tarfile.GNU_FORMAT) as tar:
         tar.add(file_path, arcname=os.path.basename(file_path))
 
-# スクリプト実行前に'2023'で始まるCSVファイルを削除
-remove_files_starting_with_2023(target_dir)
-# source_dir内の全てのCSVファイルをtarget_dirにコピー
-copy_all_csv_files(source_dir, target_dir)
+def main():
+    # スクリプト実行前に'2023'で始まるCSVファイルを削除
+    remove_files_starting_with_2023(TARGET_DIR)
+    # source_dir内の全てのCSVファイルをtarget_dirにコピー
+    copy_all_csv_files(SOURCE_DIR, TARGET_DIR)
 
-# target_dir内の全てのCSVファイルを処理する
-for filename in os.listdir(target_dir):
-    if filename.lower().endswith('.csv'):
-        print(f"Processing file: {filename}")
-        try:
-            csv_path = os.path.join(target_dir, filename)
-            skip_and_merge_rows(csv_path)
-            print(f"Successfully processed file: {filename}")
-            # 処理が成功したらファイルを圧縮
-            compress_file(csv_path, upload_dir)
-            print(f"Successfully compressed file: {filename}")
-        except Exception as e:
-            print(f"Failed to process file: {filename}. Reason: {e}")
+    # target_dir内の全てのCSVファイルを処理する
+    for filename in os.listdir(TARGET_DIR):
+        if filename.lower().endswith('.csv'):
+            print(f"Processing file: {filename}")
+            try:
+                csv_path = os.path.join(TARGET_DIR, filename)
+                skip_and_merge_rows(csv_path)
+                print(f"Successfully processed file: {filename}")
+                # 処理が成功したらファイルを圧縮
+                compress_file(csv_path, UPLOAD_DIR)
+                print(f"Successfully compressed file: {filename}")
+            except Exception as e:
+                print(f"Failed to process file: {filename}. Reason: {e}")
+
+if __name__ == "__main__":
+    main()
